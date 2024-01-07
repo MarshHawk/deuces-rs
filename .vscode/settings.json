@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./deuces3"
+    ]
+}

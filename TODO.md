@@ -1,0 +1,2 @@
+- benchmarking, of course
+- add python package compatibility coverage via py::03
