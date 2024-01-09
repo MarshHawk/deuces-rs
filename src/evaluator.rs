@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-use itertools::Itertools;
 use crate::{lookup::LookupTable, card::Card};
 
 pub struct Evaluator {
@@ -101,6 +99,11 @@ impl Evaluator {
     pub fn get_five_card_rank_percentage(&self, hand_rank: u32) -> f64 {
         hand_rank as f64 / LookupTable::MAX_HIGH_CARD as f64
     }
+
+    pub fn class_to_string(&self, class_int: u32) -> String {
+        self.table.rank_class_to_string_lookup.get(&class_int).unwrap().to_string()
+    }
+
 }
 
 #[cfg(test)]

@@ -1,6 +1,6 @@
 use rand::Rng;
 
-use crate::{evaluator::Evaluator, card::Card, model::{HandResponse, PlayerHand}};
+use crate::{evaluator::Evaluator, card::Card, model::{HandResponse, PlayerHand, Hand, Board}};
 
 static CARDS: &'static [&'static str; 52] = &[
     "Ac", "Ad", "Ah", "As", "2c", "2d", "2h", "2s", "3c", "3d", "3h", "3s", "4c", "4d", "4h", "4s",
@@ -41,9 +41,9 @@ impl Iterator for IndexGenerator {
     }
 }
 
-fn build_deal_payload(player_count: usize) {
+fn build_deal_payload(player_count: usize) -> HandResponse {
     let evaluator = Evaluator::new();
-    let mut cards = shuffle();
+    let cards = shuffle();
     let mut hands: Vec<PlayerHand> = Vec::new();
     let mut nextn = IndexGenerator::new();
     let mut i = 0;
@@ -56,25 +56,39 @@ fn build_deal_payload(player_count: usize) {
     }
 
     let flop = vec![
-        cards[nextn.next().unwrap() + pl],
-        cards[nextn.next().unwrap() + pl],
-        cards[nextn.next().unwrap() + pl],
+        cards[nextn.next().unwrap() + pl].to_string(),
+        cards[nextn.next().unwrap() + pl].to_string(),
+        cards[nextn.next().unwrap() + pl].to_string(),
     ];
 
-    let flop_score: Vec<_> = flop.iter().map(|&card| Card::new(card)).collect();
+    let flop_score: Vec<u32> = flop.iter().map(|card| Card::new(card.as_str())).collect();
     let turn = cards[nextn.next().unwrap() + pl];
     let turn_score = Card::new(turn);
     let river = cards[nextn.next().unwrap() + pl];
     let river_score = Card::new(river);
-    let mut player_hands: Vec<HandResponse> = Vec::new();
-    for hand in &mut hands {
+    let mut player_hands: Vec<Hand> = Vec::new();
+    for hand in hands {
         let mut combined_score = flop_score.clone();
         combined_score.push(turn_score);
         combined_score.push(river_score);
         let hand_score = evaluator.evaluate(combined_score, hand.score);
         let score = evaluator.get_rank_class(hand_score);
         let percentage = 1.0 - evaluator.get_five_card_rank_percentage(hand_score);
-        let description = evaluator.class_to_string(score);
-        player_hands.push(("score", percentage), ("description", description));
+        let description = evaluator.class_to_string(score.unwrap());
+        player_hands.push(Hand {
+            cards: hand.hand.clone(),
+            score: percentage,
+            description: description,
+        });
     }
+    let board = Board {
+        flop: flop.clone(),
+        turn: turn.to_string(),
+        river: river.to_string(),
+    };
+    let hr = HandResponse {
+        board: board,
+        hands: player_hands,
+    };
+    hr
 }

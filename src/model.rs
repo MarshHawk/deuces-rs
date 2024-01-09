@@ -2,7 +2,7 @@ use crate::card::Card;
 
 pub struct PlayerHand {
     pub hand: Vec<String>,
-    pub score: Vec<Card>,
+    pub score: Vec<u32>,
 }
 
 pub struct Hand {
