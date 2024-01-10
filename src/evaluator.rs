@@ -73,7 +73,7 @@ impl Evaluator {
     } */
 
     pub fn get_rank_class(&self, hr: u32) -> Result<u32, &'static str> {
-        if hr >= 0 && hr <= LookupTable::MAX_STRAIGHT_FLUSH {
+        if hr <= LookupTable::MAX_STRAIGHT_FLUSH {
             Ok(self.table.max_to_rank_class_lookup[&LookupTable::MAX_STRAIGHT_FLUSH])
         } else if hr <= LookupTable::MAX_FOUR_OF_A_KIND {
             Ok(self.table.max_to_rank_class_lookup[&LookupTable::MAX_FOUR_OF_A_KIND])

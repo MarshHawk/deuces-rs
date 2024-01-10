@@ -52,12 +52,12 @@ impl LookupTable {
 
     fn get_lexographically_next_bit_sequence(&self, bits: i32) -> impl Iterator<Item = i32> {
         let mut next = (bits | (bits - 1)) + 1;
-        next |= (((next as i32) & -(next as i32)) / ((bits as i32) & -(bits as i32)) >> (1 as i32))
-            - (1 as i32);
+        next |= (((next & -next) / (bits & -bits)) >> 1_i32)
+            - (1_i32);
 
         std::iter::successors(Some(next), |&next| {
             let t = (next | (next - 1)) + 1;
-            Some(t | ((t & -t) / (next & -next) >> 1) - 1)
+            Some(t | ((((t & -t) / (next & -next)) >> 1) - 1))
         })
     }
 
@@ -86,22 +86,14 @@ impl LookupTable {
             }
         }
 
-        // println!("flushes: {:?}", &flushes[0..4]);
-        // println!("flushes: {:?}", &flushes.len());
-
         flushes.reverse();
 
         let mut rank = 1;
         for sf in &straight_flushes {
-            // println!("sf: {}", sf);
-            let prime_product = Card::prime_product_from_rankbits(*sf as u32); // Dereference the `sf` variable
-                                                                               // println!("prime_product: {}", prime_product);
+            let prime_product = Card::prime_product_from_rankbits(*sf as u32);
             self.flush_lookup.insert(prime_product, rank);
             rank += 1;
-            // println!("rank: {}", rank);
         }
-
-        // println!("flush_lookup: {:?}", &self.flush_lookup);
 
         rank = LookupTable::MAX_FULL_HOUSE + 1;
         for f in &flushes {
@@ -109,8 +101,6 @@ impl LookupTable {
             self.flush_lookup.insert(prime_product, rank);
             rank += 1;
         }
-
-        // println!("flush_lookup: {:?}", &self.flush_lookup[&629629]);
 
         // for (i, f) in flushes.iter().enumerate() {
         //     self.flush_lookup.insert(*f, (i + 1) as u32);
@@ -138,8 +128,6 @@ impl LookupTable {
 
     pub fn multiples(&mut self) {
         let backwards_ranks: Vec<_> = (0..Card::INT_RANKS.len()).rev().collect();
-
-        // println!("{:?}", backwards_ranks);
 
         // 1) Four of a Kind
         let mut rank = LookupTable::MAX_STRAIGHT_FLUSH + 1;
@@ -245,7 +233,6 @@ impl LookupTable {
 
 #[cfg(test)]
 mod tests {
-    // use crate::Card;
     use super::*;
 
     #[test]
@@ -253,5 +240,14 @@ mod tests {
         let lookup_table = LookupTable::new();
         assert_eq!(lookup_table.flush_lookup.len(), 1287);
         assert_eq!(lookup_table.unsuited_lookup.len(), 6175);
+    }
+
+    #[test]
+    fn test_get_lexographically_next_bit_sequence() {
+        let lookup = LookupTable::new();
+        let bits = 0b11111;
+        let mut sequence = lookup.get_lexographically_next_bit_sequence(bits);
+        assert_eq!(sequence.next(), Some(47));
+        assert_eq!(sequence.next(), Some(55));
     }
 }

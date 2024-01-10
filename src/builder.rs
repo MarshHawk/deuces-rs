@@ -2,7 +2,7 @@ use rand::Rng;
 
 use crate::{evaluator::Evaluator, card::Card, model::{Deal, PlayerHand, Hand, Board}};
 
-static CARDS: &'static [&'static str; 52] = &[
+static CARDS: [&str; 52] = [
     "Ac", "Ad", "Ah", "As", "2c", "2d", "2h", "2s", "3c", "3d", "3h", "3s", "4c", "4d", "4h", "4s",
     "5c", "5d", "5h", "5s", "6c", "6d", "6h", "6s", "7c", "7d", "7h", "7s", "8c", "8d", "8h", "8s",
     "9c", "9d", "9h", "9s", "Tc", "Td", "Th", "Ts", "Jc", "Jd", "Jh", "Js", "Qc", "Qd", "Qh", "Qs",
@@ -23,24 +23,10 @@ impl CardShuffler for RandomCardShuffler {
         let mut sample = CARDS.to_vec();
         for i in 0..CARDS.len() {
             let rand: usize = rng.gen_range(0..=i);
-            let temp = sample[i];
-            sample[i] = sample[rand];
-            sample[rand] = temp;
+            sample.swap(i, rand);
         }
         sample
     }
-}
-
-fn shuffle() -> Vec<&'static str> {
-    let mut rng = rand::thread_rng();
-    let mut sample = CARDS.to_vec();
-    for i in 0..CARDS.len() {
-        let rand: usize = rng.gen_range(0..=i);
-        let temp = sample[i];
-        sample[i] = sample[rand];
-        sample[rand] = temp;
-    }
-    sample
 }
 
 struct IndexGenerator {
@@ -84,12 +70,11 @@ impl<S: CardShuffler> Dealer for GameDealer<S> {
         let cards = self.shuffler.shuffle();
         let mut hands: Vec<PlayerHand> = Vec::new();
         let mut nextn = IndexGenerator::new();
-        let mut i = 0;
+        
         let players: Vec<_> = (0..player_count).collect();
         let pl = players.len();
-        println!("players: {:?}", players);
-        for p in players {
-            i = nextn.next().unwrap();
+        for _ in players {
+            let i = nextn.next().unwrap();
             let player_hand: Vec<String> = vec![cards[i].to_string(), cards[i + pl].to_string()];
             let scores: Vec<_> = player_hand.iter().map(|card| Card::new(card)).collect();
             hands.push(PlayerHand {
@@ -121,7 +106,7 @@ impl<S: CardShuffler> Dealer for GameDealer<S> {
             player_hands.push(Hand {
                 cards: hand.hand.clone(),
                 score: percentage,
-                description: description,
+                description,
             });
         }
         let board = Board {
@@ -129,12 +114,10 @@ impl<S: CardShuffler> Dealer for GameDealer<S> {
             turn: turn.to_string(),
             river: river.to_string(),
         };
-        let hr = Deal {
-            board: board,
+        Deal {
+            board,
             hands: player_hands,
-        };
-        println!("{:?}", hr);
-        hr
+        }
     }
 }
 

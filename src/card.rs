@@ -1,7 +1,6 @@
 pub struct Card;
 
 impl Card {
-    pub const STR_RANKS: &'static str = "23456789TJQKA";
     pub const INT_RANKS: [u32; 13] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     pub const PRIMES: [u32; 13] = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41];
     pub const CHAR_RANK_TO_INT_RANK: [(char, u32); 13] = [
@@ -25,10 +24,9 @@ impl Card {
         ('d', 4), // diamonds
         ('c', 8), // clubs
     ];
-    pub const INT_SUIT_TO_CHAR_SUIT: &'static str = "xshxdxxxc";
 
     pub fn new(string: &str) -> u32 {
-        let rank_char = string.chars().nth(0).unwrap();
+        let rank_char = string.chars().next().unwrap();
         let suit_char = string.chars().nth(1).unwrap();
         let rank_int = Card::CHAR_RANK_TO_INT_RANK.iter().find(|&&(r, _)| r == rank_char).unwrap().1;
         let suit_int = Card::CHAR_SUIT_TO_INT_SUIT.iter().find(|&&(s, _)| s == suit_char).unwrap().1;
@@ -54,7 +52,7 @@ impl Card {
     pub fn prime_product_from_hand(card_ints: &[u32]) -> u32 {
         let mut product = 1;
         for &c in card_ints {
-            product *= (c & 0xFF);
+            product *= c & 0xFF;
         }
         product
     }
@@ -66,7 +64,6 @@ mod tests {
 
      #[test]
     fn test_new() {
-        // println!("2s: {:}", Card::new("2s"));
         assert_eq!(Card::new("2s"), 69634);
         assert_eq!(Card::new("3h"), 139523);
         assert_eq!(Card::new("4d"), 279045);
