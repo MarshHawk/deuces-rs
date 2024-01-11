@@ -1,4 +1,5 @@
-pub struct Card;
+#[derive(Debug, PartialEq)]
+pub struct Card(pub u32);
 
 impl Card {
     pub const INT_RANKS: [u32; 13] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -25,7 +26,7 @@ impl Card {
         ('c', 8), // clubs
     ];
 
-    pub fn new(string: &str) -> u32 {
+    pub fn new(string: &str) -> Self {
         let rank_char = string.chars().next().unwrap();
         let suit_char = string.chars().nth(1).unwrap();
         let rank_int = Card::CHAR_RANK_TO_INT_RANK.iter().find(|&&(r, _)| r == rank_char).unwrap().1;
@@ -36,7 +37,9 @@ impl Card {
         let suit = suit_int << 12;
         let rank = rank_int << 8;
 
-        bitrank | suit | rank | rank_prime
+        let card_int = bitrank | suit | rank | rank_prime;
+
+        Card(card_int)
     }
 
     pub fn prime_product_from_rankbits(rankbits: u32) -> u32 {
@@ -64,10 +67,10 @@ mod tests {
 
      #[test]
     fn test_new() {
-        assert_eq!(Card::new("2s"), 69634);
-        assert_eq!(Card::new("3h"), 139523);
-        assert_eq!(Card::new("4d"), 279045);
-        assert_eq!(Card::new("Ac"), 268471337);
+        assert_eq!(Card::new("2s").0, 69634);
+        assert_eq!(Card::new("3h").0, 139523);
+        assert_eq!(Card::new("4d").0, 279045);
+        assert_eq!(Card::new("Ac").0, 268471337);
     }
 
     #[test]

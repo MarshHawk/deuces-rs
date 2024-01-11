@@ -53,12 +53,12 @@ pub trait Dealer {
     fn deal(&self, player_count: usize) -> Deal;
 }
 
-// Implement the interface for a struct
 pub struct GameDealer<S: CardShuffler> {
     shuffler: S,
 }
 
 impl<S: CardShuffler> GameDealer<S> {
+    #[allow(dead_code)]
     pub fn new(shuffler: S) -> Self {
         GameDealer { shuffler }
     }
@@ -76,7 +76,7 @@ impl<S: CardShuffler> Dealer for GameDealer<S> {
         for _ in players {
             let i = nextn.next().unwrap();
             let player_hand: Vec<String> = vec![cards[i].to_string(), cards[i + pl].to_string()];
-            let scores: Vec<_> = player_hand.iter().map(|card| Card::new(card)).collect();
+            let scores: Vec<u32> = player_hand.iter().map(|card| Card::new(card).0).collect();
             hands.push(PlayerHand {
                 hand: player_hand,
                 score: scores,
@@ -89,11 +89,11 @@ impl<S: CardShuffler> Dealer for GameDealer<S> {
             cards[nextn.next().unwrap() + pl].to_string(),
         ];
     
-        let flop_score: Vec<u32> = flop.iter().map(|card| Card::new(card.as_str())).collect();
+        let flop_score: Vec<u32> = flop.iter().map(|card| Card::new(card.as_str()).0).collect();
         let turn = cards[nextn.next().unwrap() + pl];
-        let turn_score = Card::new(turn);
+        let turn_score = Card::new(turn).0;
         let river = cards[nextn.next().unwrap() + pl];
-        let river_score = Card::new(river);
+        let river_score = Card::new(river).0;
         let mut player_hands: Vec<Hand> = Vec::new();
         for hand in hands {
             let mut combined_score = flop_score.clone();
