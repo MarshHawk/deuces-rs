@@ -5,7 +5,7 @@ homepage = "https://github.com/MarshHawk/deuces-rs"
 categories = ["poker", "texas-holdem"]
 keywords = ["poker", "texas-holdem"]
 license = "MIT"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 readme = "README.md"
 
