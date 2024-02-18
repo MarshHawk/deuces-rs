@@ -1,4 +1,5 @@
 use crate::{lookup::LookupTable, card::Card};
+use itertools::Itertools;
 
 pub struct Evaluator {
     table: LookupTable,
@@ -21,7 +22,7 @@ impl Evaluator {
     pub fn evaluate(&self, cards: Vec<u32>, board: Vec<u32>) -> u32 {
         let mut all_cards = cards;
         all_cards.extend(board);
-        self._five(&[all_cards[0], all_cards[1], all_cards[2], all_cards[3], all_cards[4]])
+        self._seven(&[all_cards[0], all_cards[1], all_cards[2], all_cards[3], all_cards[4], all_cards[5], all_cards[6]])
         //match all_cards.len() {
         //    5 => self._five(&[all_cards[0], all_cards[1], all_cards[2], all_cards[3], all_cards[4]]),
         //    6 => self._six(&[all_cards[0], all_cards[1], all_cards[2], all_cards[3], all_cards[4], all_cards[5]]),
@@ -44,12 +45,12 @@ impl Evaluator {
         }
     }
 
-/*     pub fn _six(&self, cards: &[u32; 6]) -> u32 {
+    pub fn _seven(&self, cards: &[u32; 7]) -> u32 {
         let mut minimum = LookupTable::MAX_HIGH_CARD;
 
         let all5cardcombos: Vec<_> = cards.iter().combinations(5).collect();
         for combo in all5cardcombos {
-            let score = self._five(&[combo[0], combo[1], combo[2], combo[3], combo[4]]);
+            let score = self._five(&[*combo[0], *combo[1], *combo[2], *combo[3], *combo[4]]);
             if score < minimum {
                 minimum = score;
             }
@@ -57,20 +58,6 @@ impl Evaluator {
 
         minimum
     }
-
-    pub fn _seven(&self, cards: &[u32; 7]) -> u32 {
-        let mut minimum = LookupTable::MAX_HIGH_CARD;
-
-        let all5cardcombos: Vec<_> = cards.iter().combinations(5).collect();
-        for combo in all5cardcombos {
-            let score = self._five(&[combo[0], combo[1], combo[2], combo[3], combo[4]]);
-            if score < minimum {
-                minimum = score;
-            }
-        }
-
-        minimum
-    } */
 
     pub fn get_rank_class(&self, hr: u32) -> Result<u32, &'static str> {
         if hr <= LookupTable::MAX_STRAIGHT_FLUSH {
